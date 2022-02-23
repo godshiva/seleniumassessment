@@ -1,6 +1,10 @@
+from time import time
+
 import pytest
 from selenium import webdriver
 import platform
+
+from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.chrome.service import Service
 
 
@@ -22,3 +26,16 @@ def seleniumdriver(is_mac):
     yield driver
     driver.close()
 
+
+@pytest.fixture(scope="function")
+def wait_for_invisibility(seleniumdriver):
+    def _do_wait(element, time_to_wait = 10):
+        start_time = time()
+        while start_time + time_to_wait > time():
+            try:
+                element.is_displayed()
+            except StaleElementReferenceException as Exception:
+                return
+        assert False, "Timeout waiting for element to disappear"
+
+    yield _do_wait

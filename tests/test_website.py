@@ -35,12 +35,24 @@ def test_select_from_dropdown(seleniumdriver):
     assert len(elements) == 1 and elements[0].get_attribute('value') == '1', f"Invalid selection {elements}"
 
 
-
-
 @pytest.mark.skip("hold on")
-def test_notification_message(seleniumdriver):
+def test_notification_message(seleniumdriver, wait_for_invisibility):
     seleniumdriver.get("http://the-internet.herokuapp.com/notification_message")
 
+    # see if existing notification message exists, if so, close it
+
+    elements = seleniumdriver.find_elements(By.CSS_SELECTOR, "a.close")
+    assert len(elements) < 2, f"Unexpected configuration {elements}"
+    if len(elements) == 1:
+        elements[0].click()
+        wait_for_invisibility(elements[0])
+
+    assert len(seleniumdriver.find_elements(By.CSS_SELECTOR, "#flash")) == 0
+
+    seleniumdriver.find_element(By.CSS_SELECTOR, "a[href*='notification_message']").click()
+
+    element = seleniumdriver.find_element(By.CSS_SELECTOR, "#flash")
+    assert 'Action' in element.text, f"Unexpected text from message {element}"
 
 
 @pytest.mark.skip("hold on")
