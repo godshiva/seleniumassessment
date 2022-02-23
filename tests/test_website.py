@@ -4,10 +4,7 @@ import pytest
 import requests as requests
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
-@pytest.mark.skip("hold on")
 def test_broken_images(seleniumdriver):
     seleniumdriver.get("http://the-internet.herokuapp.com/broken_images")
     invalid_files = []
@@ -25,7 +22,6 @@ def test_broken_images(seleniumdriver):
     assert invalid_files == ['http://the-internet.herokuapp.com/asdf.jpg', 'http://the-internet.herokuapp.com/hjkl.jpg'], " ".join(invalid_files) + " missing from page"
 
 
-@pytest.mark.skip("hold on")
 def test_select_from_dropdown(seleniumdriver):
     seleniumdriver.get("http://the-internet.herokuapp.com/dropdown")
     select_object = Select(seleniumdriver.find_element(By.CSS_SELECTOR, "#dropdown"));
@@ -35,7 +31,6 @@ def test_select_from_dropdown(seleniumdriver):
     assert len(elements) == 1 and elements[0].get_attribute('value') == '1', f"Invalid selection {elements}"
 
 
-@pytest.mark.skip("hold on")
 def test_notification_message(seleniumdriver, wait_for_invisibility):
     seleniumdriver.get("http://the-internet.herokuapp.com/notification_message")
 
@@ -55,13 +50,58 @@ def test_notification_message(seleniumdriver, wait_for_invisibility):
     assert 'Action' in element.text, f"Unexpected text from message {element}"
 
 
-@pytest.mark.skip("hold on")
 def test_click_button_dismiss_alert(seleniumdriver):
     seleniumdriver.get("http://the-internet.herokuapp.com/javascript_alerts")
+    seleniumdriver.find_element(By.CSS_SELECTOR, "button[onclick='jsAlert()']").click()
+    alert = seleniumdriver.switch_to.alert
+    alert.accept()
+
+    def _get_msg():
+        return seleniumdriver.find_element(By.CSS_SELECTOR, "#result").text.strip()
+
+    assert 'You successfully clicked an alert' == _get_msg()
+
+    seleniumdriver.find_element(By.CSS_SELECTOR, "button[onclick='jsConfirm()']").click()
+    alert = seleniumdriver.switch_to.alert
+    alert.accept()
+
+    assert 'You clicked: Ok' == _get_msg()
+
+    seleniumdriver.find_element(By.CSS_SELECTOR, "button[onclick='jsConfirm()']").click()
+    alert = seleniumdriver.switch_to.alert
+    alert.dismiss()
+
+    assert 'You clicked: Cancel' == _get_msg()
+
+    seleniumdriver.find_element(By.CSS_SELECTOR, "button[onclick='jsPrompt()']").click()
+    alert = seleniumdriver.switch_to.alert
+    alert.send_keys("monkey")
+    alert.accept()
+
+    assert 'You entered: monkey' == _get_msg()
+
+    seleniumdriver.find_element(By.CSS_SELECTOR, "button[onclick='jsPrompt()']").click()
+    alert = seleniumdriver.switch_to.alert
+    alert.send_keys("birdie")
+    alert.dismiss()
+
+    assert 'You entered: null' == _get_msg()  # todo: Verify with devs that this is the intended behavior
 
 
 
-@pytest.mark.skip("hold on")
 def test_detect_typo(seleniumdriver):
     seleniumdriver.get("http://the-internet.herokuapp.com/typos")
+    correct_text = "Sometimes you'll see a typo, other times you won't."
 
+    found_typo = False
+    num_attempts = 10
+
+    for i in range(num_attempts):
+        document_text = seleniumdriver.find_element(By.CSS_SELECTOR, "div.example").text
+        if correct_text not in document_text:
+            found_typo = True
+            break
+        else:
+            seleniumdriver.refresh()
+
+    assert found_typo, f"Typo not found in {num_attempts} attempts! {document_text}"
