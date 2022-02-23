@@ -1,9 +1,9 @@
 import time
-
 import pytest
 import requests as requests
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
+
 
 def test_broken_images(seleniumdriver):
     seleniumdriver.get("http://the-internet.herokuapp.com/broken_images")
@@ -86,7 +86,6 @@ def test_click_button_dismiss_alert(seleniumdriver):
     alert.dismiss()
 
     assert 'You entered: null' == _get_msg()  # todo: Verify with devs that this is the intended behavior
-
 
 
 def test_detect_typo(seleniumdriver):
