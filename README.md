@@ -1,10 +1,8 @@
 Instructions:
 1. Navigate to project root
 2. Set up virtual environment, switch if required (if using IDE, this will be done for you)
-3. Install dependencies
-   a. pip install -r requirements.txt
-4. execute tests
-   a. python -m pytest
+3. Install dependencies: pip install -r requirements.txt
+4. execute tests: python -m pytest
 
 Troubleshooting:
 1. If tests fail to run, verify that the version of installed Chrome matches the version of the ChromeDriver (ChromeDriver 98.0.4758.102)  Updated driver can be found here (https://sites.google.com/chromium.org/driver/)
