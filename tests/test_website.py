@@ -3,8 +3,11 @@ import time
 import pytest
 import requests as requests
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.select import Select
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
-
+@pytest.mark.skip("hold on")
 def test_broken_images(seleniumdriver):
     seleniumdriver.get("http://the-internet.herokuapp.com/broken_images")
     invalid_files = []
@@ -22,22 +25,31 @@ def test_broken_images(seleniumdriver):
     assert invalid_files == ['http://the-internet.herokuapp.com/asdf.jpg', 'http://the-internet.herokuapp.com/hjkl.jpg'], " ".join(invalid_files) + " missing from page"
 
 
+@pytest.mark.skip("hold on")
 def test_select_from_dropdown(seleniumdriver):
     seleniumdriver.get("http://the-internet.herokuapp.com/dropdown")
+    select_object = Select(seleniumdriver.find_element(By.CSS_SELECTOR, "#dropdown"));
+    select_object.select_by_value("1")
+    time.sleep(3)
+    elements = seleniumdriver.find_elements(By.TAG_NAME, "select>option[selected='selected']")
+    assert len(elements) == 1 and elements[0].get_attribute('value') == '1', f"Invalid selection {elements}"
 
-    assert True
 
+
+
+@pytest.mark.skip("hold on")
 def test_notification_message(seleniumdriver):
     seleniumdriver.get("http://the-internet.herokuapp.com/notification_message")
 
-    assert True
 
+
+@pytest.mark.skip("hold on")
 def test_click_button_dismiss_alert(seleniumdriver):
     seleniumdriver.get("http://the-internet.herokuapp.com/javascript_alerts")
 
-    assert True
 
+
+@pytest.mark.skip("hold on")
 def test_detect_typo(seleniumdriver):
     seleniumdriver.get("http://the-internet.herokuapp.com/typos")
 
-    assert True
